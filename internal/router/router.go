@@ -3,7 +3,7 @@ package router
 import (
 	a "QA-System/internal/handler/admin"
 	u "QA-System/internal/handler/user"
-	"QA-System/internal/middleware"
+	middlewares "QA-System/internal/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -16,7 +16,7 @@ func Init(r *gin.Engine) {
 	{
 		api.POST("/admin/reg", a.Register)
 		api.POST("/admin/login", a.Login)
-		user:= api.Group("/user")
+		user := api.Group("/user")
 		{
 			user.POST("/submit", u.SubmitSurvey)
 			user.GET("/get", u.GetSurvey)
@@ -44,6 +44,7 @@ func Init(r *gin.Engine) {
 
 			admin.GET("/log", a.GetLogMsg)
 
+			admin.DELETE("/deleteanswersheet", a.DeleteAnswerSheetByIDHandler)
 		}
 	}
 }

@@ -6,15 +6,17 @@ import (
 	"QA-System/internal/pkg/log"
 	"QA-System/internal/pkg/utils"
 	"bufio"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
-	"github.com/xuri/excelize/v2"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/xuri/excelize/v2"
 )
 
 func GetAdminByUsername(username string) (*models.User, error) {
@@ -146,7 +148,7 @@ func UpdateSurvey(id int, title string, desc string, img string, questions []dao
 	return nil
 }
 
-func UpdateSurveyPart(id int, title string, desc string, img string,  time time.Time) error {
+func UpdateSurveyPart(id int, title string, desc string, img string, time time.Time) error {
 	return d.UpdateSurvey(ctx, id, title, desc, img, time)
 }
 
@@ -732,9 +734,14 @@ func HandleDownloadFile(answers dao.AnswersResonse, survey *models.Survey) (stri
 	return url, nil
 }
 
-
 func UpdateAdminPassword(id int, password string) error {
 	password = utils.AesEncrypt(password)
 	err := d.UpdateUserPassword(ctx, id, password)
+	return err
+}
+
+// DeleteAnswerSheetByID 根据 AnswerSheetID 删除答卷
+func DeleteAnswerSheetByID(ctx context.Context, answerSheetID string) error {
+	err := d.DeleteAnswerSheetByID(ctx, answerSheetID)
 	return err
 }

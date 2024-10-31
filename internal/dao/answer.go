@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -17,10 +18,11 @@ type Answer struct {
 }
 
 type AnswerSheet struct {
-	SurveyID int      `json:"survey_id" bson:"surveyid"` // 问卷ID
-	Time     string   `json:"time" bson:"time"`          // 答卷时间
-	Unique   bool     `json:"unique" bson:"unique"`      // 是否唯一
-	Answers  []Answer `json:"answers" bson:"answers"`    // 答案列表
+	AnswerSheetID primitive.ObjectID `json:"answer_sheet_id" bson:"_id,omitempty"` // 答卷唯一主键
+	SurveyID      int                `json:"survey_id" bson:"surveyid"`            // 问卷ID
+	Time          string             `json:"time" bson:"time"`                     // 答卷时间
+	Unique        bool               `json:"unique" bson:"unique"`                 // 是否唯一
+	Answers       []Answer           `json:"answers" bson:"answers"`               // 答案列表
 }
 
 type QuestionAnswers struct {
@@ -176,4 +178,25 @@ func (d *Dao) DeleteAnswerSheetBySurveyID(ctx context.Context, surveyID int) err
 	// 删除所有满足条件的文档
 	_, err := d.mongo.DeleteMany(ctx, filter)
 	return err
+}
+
+// DeleteAnswerSheetByID 根据 AnswerSheetID 删除指定的答卷
+func (d *Dao) DeleteAnswerSheetByID(ctx context.Context, answerSheetID string) error {
+	objID, err := primitive.ObjectIDFromHex(answerSheetID)
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{"_id": objID}
+
+	result, err := d.mongo.DeleteOne(ctx, filter)
+	if err != nil {
+		return err
+	}
+
+	if result.DeletedCount == 0 {
+		return mongo.ErrNoDocuments
+	}
+
+	return nil
 }
