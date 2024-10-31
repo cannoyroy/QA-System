@@ -6,7 +6,6 @@ import (
 	"QA-System/internal/pkg/log"
 	"QA-System/internal/pkg/utils"
 	"bufio"
-	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -741,7 +740,7 @@ func UpdateAdminPassword(id int, password string) error {
 }
 
 // DeleteAnswerSheetByID 根据 AnswerSheetID 删除答卷
-func DeleteAnswerSheetByID(ctx context.Context, answerSheetID string) error {
+func DeleteAnswerSheetByID(answerSheetID string) error {
 	err := d.DeleteAnswerSheetByID(ctx, answerSheetID)
 	return err
 }

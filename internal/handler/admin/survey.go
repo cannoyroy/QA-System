@@ -861,18 +861,22 @@ func DeleteAnswerSheetByIDHandler(c *gin.Context) {
 
 	// 检查参数是否存在
 	if answerSheetID == "" {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "需要 answer_sheet_id 参数"})
+		c.Error(&gin.Error{Err: errors.New("需要 answer_sheet_id 参数"), Type: gin.ErrorTypeAny})
+		utils.JsonErrorResponse(c, code.ParamError)
 		return
 	}
 
 	// 调用服务层删除答卷
-	err := service.DeleteAnswerSheetByID(c.Request.Context(), answerSheetID)
+	err := service.DeleteAnswerSheetByID(answerSheetID)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			c.JSON(http.StatusNotFound, gin.H{"error": "未找到对应的答卷记录"})
+			c.Error(&gin.Error{Err: errors.New("未找到对应的答卷记录" + err.Error()), Type: gin.ErrorTypeAny})
+			utils.JsonErrorResponse(c, code.NotFound)
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": "删除答卷时出错"})
+			c.Error(&gin.Error{Err: errors.New("删除答卷时出错: " + err.Error()), Type: gin.ErrorTypeAny})
+			utils.JsonErrorResponse(c, code.ServerError)
 		}
+
 		return
 	}
 
